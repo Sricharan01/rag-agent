@@ -79,11 +79,6 @@ export function ChatInput({ onSend, onStop, isLoading, disabled }: Props) {
           </button>
         </div>
       </div>
-      <p className="input-hint">
-        {isLoading
-          ? "Searching knowledge base and generating answer…"
-          : "Powered by Claude AI + Supabase pgvector hybrid search"}
-      </p>
     </div>
   );
 }

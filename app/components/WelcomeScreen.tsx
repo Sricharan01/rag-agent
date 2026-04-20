@@ -18,25 +18,7 @@ export function WelcomeScreen({ onSuggestion, hasDocuments }: Props) {
   return (
     <div className="welcome-screen">
       <div className="welcome-content">
-        {/* Logo / Icon */}
-        <div className="welcome-logo">
-          <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-            <rect width="48" height="48" rx="12" fill="url(#grad)" />
-            <path
-              d="M14 20h20M14 28h14M24 34l8-6-8-6v12z"
-              stroke="white"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <defs>
-              <linearGradient id="grad" x1="0" y1="0" x2="48" y2="48">
-                <stop offset="0%" stopColor="#7c3aed" />
-                <stop offset="100%" stopColor="#2563eb" />
-              </linearGradient>
-            </defs>
-          </svg>
-        </div>
+
 
         {/* Headline */}
         <h1 className="welcome-title">RAG Knowledge Agent</h1>

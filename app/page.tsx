@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { BookOpen, Trash2, Menu, Zap, Settings } from "lucide-react";
+import { BookOpen, Trash2, Menu, Settings } from "lucide-react";
 
 import { useChat } from "./hooks/useChat";
 import { useDocuments } from "./hooks/useDocuments";
@@ -81,7 +81,6 @@ export default function Home() {
           </button>
 
           <div className="flex items-center gap-2">
-            <Zap size={16} className="text-violet-400" />
             <h1 className="header-title">RAG Knowledge Agent</h1>
           </div>
 

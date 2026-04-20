@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import {
   X, Save, Eye, EyeOff, CheckCircle2, XCircle, Loader2,
-  KeyRound, Cpu, Zap, AlertCircle
+  KeyRound, Cpu, AlertCircle
 } from "lucide-react";
 
 interface Props {
@@ -155,7 +155,7 @@ export function SettingsPanel({ onClose }: Props) {
         {/* Header */}
         <div className="settings-header">
           <div className="settings-title-row">
-            <KeyRound size={17} className="text-violet-400" />
+            <KeyRound size={17} className="text-amber-700" />
             <h2 className="settings-title">API Keys & Settings</h2>
           </div>
           <button onClick={onClose} className="settings-close"><X size={18} /></button>
@@ -163,14 +163,14 @@ export function SettingsPanel({ onClose }: Props) {
 
         {loading ? (
           <div className="settings-loading">
-            <Loader2 size={24} className="spinning text-violet-400" />
+            <Loader2 size={24} className="spinning text-amber-700" />
             <p>Loading settings…</p>
           </div>
         ) : (
           <div className="settings-body">
             {/* Notice */}
             <div className="settings-notice">
-              <AlertCircle size={13} className="text-violet-400 flex-shrink-0" />
+              <AlertCircle size={13} className="text-amber-700 flex-shrink-0" />
               <p>Keys are saved permanently to your Supabase database. Environment variables take priority over saved keys.</p>
             </div>
 
@@ -206,7 +206,7 @@ export function SettingsPanel({ onClose }: Props) {
             {/* API Key Fields */}
             <div className="settings-section">
               <div className="settings-section-label">
-                <Zap size={13} />
+                <KeyRound size={13} />
                 API Keys
               </div>
               <KeyField
