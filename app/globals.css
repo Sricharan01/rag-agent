@@ -1067,6 +1067,93 @@ body {
 
 .mobile-menu-btn:hover { color: var(--text-primary); background: var(--bg-hover); }
 
+/* ── Provider Toggle (HF ↔ GPT) ─────────────────────────────────── */
+.provider-toggle-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(200, 175, 140, 0.18);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 0.2rem 0.5rem;
+}
+
+.toggle-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  transition: color 0.2s;
+  user-select: none;
+}
+
+.toggle-label.active-label { color: var(--accent); }
+
+.provider-toggle {
+  position: relative;
+  width: 34px;
+  height: 18px;
+  border-radius: 100px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.25s;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.provider-toggle.hf-mode {
+  background: linear-gradient(135deg, #b45309, #d97706);
+}
+
+.provider-toggle.openai-mode {
+  background: #0ea5e9;
+}
+
+.toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: white;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  display: block;
+}
+
+.provider-toggle.openai-mode .toggle-thumb {
+  transform: translateX(16px);
+}
+
+/* ── Provider Badge on messages ──────────────────────────────────── */
+.provider-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 100px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+}
+
+.badge-hf {
+  background: rgba(180, 83, 9, 0.1);
+  border: 1px solid rgba(180, 83, 9, 0.25);
+  color: #b45309;
+}
+
+.badge-openai {
+  background: rgba(14, 165, 233, 0.1);
+  border: 1px solid rgba(14, 165, 233, 0.3);
+  color: #0284c7;
+}
+
+
 /* ── Responsive ─────────────────────────────────────────────────── */
 @media (max-width: 1023px) {
   .message-body { max-width: 100%; }

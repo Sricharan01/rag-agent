@@ -17,12 +17,14 @@ export interface QueryRequest {
   query: string;
   conversationHistory?: { role: "user" | "assistant"; content: string }[];
   topK?: number;
+  preferOpenAI?: boolean;
 }
 
 export interface QueryResponse {
   answer: string;
   sources: DocumentChunk[];
   reasoning: string;
+  provider?: string;
   elapsed?: number;
 }
 
@@ -46,6 +48,7 @@ export interface Message {
   content: string;
   sources?: DocumentChunk[];
   reasoning?: string;
+  provider?: string;
   elapsed?: number;
   timestamp: Date;
 }

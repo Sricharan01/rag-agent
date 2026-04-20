@@ -13,7 +13,8 @@ import { WelcomeScreen } from "./components/WelcomeScreen";
 import { SettingsPanel } from "./components/SettingsPanel";
 
 export default function Home() {
-  const { messages, isLoading, sendMessage, clearChat, stopGeneration } = useChat();
+  const [preferOpenAI, setPreferOpenAI] = useState(false);
+  const { messages, isLoading, sendMessage, clearChat, stopGeneration } = useChat(preferOpenAI);
   const {
     documents,
     isUploading,
@@ -82,6 +83,21 @@ export default function Home() {
 
           <div className="flex items-center gap-2">
             <h1 className="header-title">RAG Knowledge Agent</h1>
+          </div>
+
+          {/* AI Provider Toggle */}
+          <div className="provider-toggle-wrap" title={preferOpenAI ? "Using GPT-4o-mini (OpenAI)" : "Using Mistral-7B (HuggingFace)"}>
+            <span className={`toggle-label ${!preferOpenAI ? "active-label" : ""}`}>HF</span>
+            <button
+              id="provider-toggle"
+              role="switch"
+              aria-checked={preferOpenAI}
+              onClick={() => setPreferOpenAI((v) => !v)}
+              className={`provider-toggle ${preferOpenAI ? "openai-mode" : "hf-mode"}`}
+            >
+              <span className="toggle-thumb" />
+            </button>
+            <span className={`toggle-label ${preferOpenAI ? "active-label" : ""}`}>GPT</span>
           </div>
 
           {/* Status badge */}

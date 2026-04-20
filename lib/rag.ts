@@ -281,7 +281,8 @@ export async function generateAnswer(
   query: string,
   chunks: DocumentChunk[],
   conversationHistory: { role: "user" | "assistant"; content: string }[] = [],
-  sourceFilter?: string
+  sourceFilter?: string,
+  preferOpenAI: boolean = false
 ): Promise<{ answer: string; reasoning: string; provider: string }> {
   const context = buildContext(chunks);
 
@@ -323,22 +324,39 @@ ${context}`;
     { role: "user", content: query },
   ];
 
-  try {
-    const answer = await generateWithOpenAI(systemPrompt, messages);
-    const reasoning = `GPT-4o-mini · ${chunks.length} chunks · ${docGroups.size} doc(s)${sourceFilter ? ` · scoped to "${sourceFilter}"` : ""}`;
-    return { answer, reasoning, provider: "openai" };
-  } catch (openaiErr) {
-    console.warn("[RAG] OpenAI failed, trying HuggingFace:", (openaiErr as Error).message);
+  // If user toggled OpenAI → try OpenAI first, fallback HuggingFace
+  if (preferOpenAI) {
+    try {
+      const answer = await generateWithOpenAI(systemPrompt, messages);
+      const reasoning = `GPT-4o-mini · ${chunks.length} chunks · ${docGroups.size} doc(s)${sourceFilter ? ` · scoped to "${sourceFilter}"` : ""}`;
+      return { answer, reasoning, provider: "openai" };
+    } catch (openaiErr) {
+      console.warn("[RAG] OpenAI failed, falling back to HuggingFace:", (openaiErr as Error).message);
+    }
+    try {
+      const answer = await generateWithHuggingFace(systemPrompt, messages);
+      const reasoning = `Mistral-7B · ${chunks.length} chunks · ${docGroups.size} doc(s)${sourceFilter ? ` · scoped to "${sourceFilter}"` : ""}`;
+      return { answer, reasoning, provider: "huggingface" };
+    } catch {
+      throw new Error(`Both AI providers failed. Check your API keys.`);
+    }
   }
 
+  // Default: HuggingFace primary, OpenAI fallback
   try {
     const answer = await generateWithHuggingFace(systemPrompt, messages);
     const reasoning = `Mistral-7B · ${chunks.length} chunks · ${docGroups.size} doc(s)${sourceFilter ? ` · scoped to "${sourceFilter}"` : ""}`;
     return { answer, reasoning, provider: "huggingface" };
+  } catch (hfErr) {
+    console.warn("[RAG] HuggingFace failed, falling back to OpenAI:", (hfErr as Error).message);
+  }
+
+  try {
+    const answer = await generateWithOpenAI(systemPrompt, messages);
+    const reasoning = `GPT-4o-mini · ${chunks.length} chunks · ${docGroups.size} doc(s)${sourceFilter ? ` · scoped to "${sourceFilter}"` : ""}`;
+    return { answer, reasoning, provider: "openai" };
   } catch {
-    throw new Error(
-      `Both AI providers failed. OpenAI and HuggingFace are unavailable. Check your API keys.`
-    );
+    throw new Error(`Both AI providers failed. HuggingFace and OpenAI are unavailable. Check your API keys.`);
   }
 }
 
@@ -404,17 +422,19 @@ export async function queryRAG(request: QueryRequest): Promise<QueryResponse> {
     };
   }
 
-  const { answer, reasoning } = await generateAnswer(
+  const { answer, reasoning, provider } = await generateAnswer(
     query,
     chunks,
     conversationHistory,
-    sourceFilter ?? undefined
+    sourceFilter ?? undefined,
+    request.preferOpenAI ?? false
   );
 
   return {
     answer,
     sources: chunks.slice(0, 10),
     reasoning,
+    provider,
     elapsed: (Date.now() - startTime) / 1000,
   };
 }

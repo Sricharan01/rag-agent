@@ -169,6 +169,13 @@ export function MessageBubble({ message, isLatest }: Props) {
 
         {!isUser && (
           <div className="message-actions">
+            {/* Provider badge */}
+            {message.provider && (
+              <span className={`provider-badge ${message.provider === "openai" ? "badge-openai" : "badge-hf"}`}>
+                {message.provider === "openai" ? "⚡ GPT-4o-mini" : "🤗 Mistral-7B"}
+              </span>
+            )}
+
             {hasElapsed && (
               <span className="meta-chip">
                 <Clock size={10} />

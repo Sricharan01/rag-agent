@@ -4,7 +4,7 @@ import { useState, useCallback, useRef } from "react";
 import { v4 as uuidv4 } from "uuid";
 import type { Message, DocumentChunk } from "@/types";
 
-export function useChat() {
+export function useChat(preferOpenAI: boolean = false) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
@@ -38,6 +38,7 @@ export function useChat() {
           query: query.trim(),
           conversationHistory: history,
           topK: 8,
+          preferOpenAI,
         }),
         signal: abortRef.current.signal,
       });
@@ -54,6 +55,7 @@ export function useChat() {
         content: data.answer,
         sources: data.sources || [],
         reasoning: data.reasoning || "",
+        provider: data.provider || "unknown",
         elapsed: data.elapsed,
         timestamp: new Date(),
       };
@@ -73,7 +75,7 @@ export function useChat() {
       setIsLoading(false);
       abortRef.current = null;
     }
-  }, [messages, isLoading]);
+  }, [messages, isLoading, preferOpenAI]);
 
   const stopGeneration = useCallback(() => {
     abortRef.current?.abort();

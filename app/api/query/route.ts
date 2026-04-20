@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { query, conversationHistory = [], topK = 20 } = body;
+    const { query, conversationHistory = [], topK = 20, preferOpenAI = false } = body;
 
     if (!query || typeof query !== "string" || query.trim().length === 0) {
       return NextResponse.json(
@@ -26,7 +26,8 @@ export async function POST(req: NextRequest) {
     const result = await queryRAG({
       query: query.trim(),
       conversationHistory,
-      topK: Math.min(Math.max(topK, 1), 50), // Clamp 1–50
+      topK: Math.min(Math.max(topK, 1), 50),
+      preferOpenAI,
     });
 
     return NextResponse.json(result, { status: 200 });
