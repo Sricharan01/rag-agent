@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -11,6 +12,16 @@ export const metadata: Metadata = {
     description: "AI-powered document Q&A with hybrid vector search",
     type: "website",
   },
+};
+
+// viewport-fit=cover enables env(safe-area-inset-*) on iOS notch/home-bar devices
+// interactive-widget=resizes-content makes the layout shrink when keyboard opens
+// (instead of the page scrolling behind the keyboard, which hides the input)
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  interactiveWidget: "resizes-content",
 };
 
 export default function RootLayout({

@@ -46,16 +46,24 @@
 /* ── Base ──────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; }
 
-html { height: 100%; scrollbar-color: #c9b89a transparent; }
+html {
+  height: 100%;
+  /* Use dvh (dynamic viewport height) to account for mobile browser chrome */
+  height: 100dvh;
+  scrollbar-color: #c9b89a transparent;
+}
 
 body {
   height: 100%;
+  height: 100dvh;
   margin: 0;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--bg-primary);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   overflow: hidden;
+  /* Prevent iOS bounce scroll on body */
+  overscroll-behavior: none;
 }
 
 /* Beautiful scrollbar */
@@ -1062,6 +1070,57 @@ body {
 /* ── Responsive ─────────────────────────────────────────────────── */
 @media (max-width: 1023px) {
   .message-body { max-width: 100%; }
+}
+
+/* ── Mobile Viewport Fix ─────────────────────────────────────────── */
+/*
+  On mobile browsers (iOS Safari, Chrome for Android), 100vh includes the
+  browser's address bar and toolbar, causing the layout to overflow the
+  visible area. The chat input gets pushed off screen and requires awkward
+  2-finger scrolling. We fix this with:
+  1. dvh units (dynamic viewport height) — shrinks when browser chrome appears
+  2. Safe area insets — accounts for iPhone notch and home indicator bar
+  3. Ensuring the input bar always stays pinned within visible area
+*/
+@media (max-width: 768px) {
+  /* Root container must fill the true visible area, not the full 100vh */
+  .h-screen {
+    height: 100dvh !important;
+  }
+
+  /* Reduce header padding on mobile to save vertical space */
+  .app-header {
+    padding: 0.625rem 0.875rem;
+  }
+
+  /* Ensure the input bar has breathing room from the phone home bar */
+  /* env(safe-area-inset-bottom) = 0px on Android, ~34px on iPhone with home bar */
+  .px-4.py-4.border-t.flex-shrink-0 {
+    padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+    padding-top: 0.75rem;
+  }
+
+  /* Prevent textarea from growing too tall and pushing input off screen */
+  .chat-textarea {
+    max-height: 120px;
+  }
+
+  /* Slightly shrink welcome screen padding on mobile */
+  .welcome-screen {
+    padding: 1rem;
+    align-items: flex-start;
+    overflow-y: auto;
+  }
+
+  .welcome-content {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+  }
+
+  /* Reduce welcome title size on small screens */
+  .welcome-title {
+    font-size: 1.35rem;
+  }
 }
 
 /* ── Settings Modal ──────────────────────────────────────────────── */
