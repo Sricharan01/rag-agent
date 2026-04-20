@@ -1,0 +1,28 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "next build",
+  "devCommand": "next dev",
+  "installCommand": "npm install --legacy-peer-deps",
+  "functions": {
+    "app/api/ingest/route.ts": {
+      "maxDuration": 300
+    },
+    "app/api/query/route.ts": {
+      "maxDuration": 120
+    },
+    "app/api/settings/route.ts": {
+      "maxDuration": 30
+    }
+  },
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET,POST,DELETE,OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type,Authorization" },
+        { "key": "Cache-Control", "value": "no-store" }
+      ]
+    }
+  ]
+}
