@@ -3,7 +3,7 @@
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { ChevronDown, ChevronRight, BookOpen, Brain, Clock, Copy, Check, User, Bot } from "lucide-react";
+import { ChevronDown, ChevronRight, BookOpen, Brain, Clock, Copy, Check, User, Bot, FileText } from "lucide-react";
 import type { Message, DocumentChunk } from "@/types";
 
 interface Props {
@@ -17,9 +17,10 @@ function SourceCard({ chunk, index }: { chunk: DocumentChunk; index: number }) {
     ? Math.round(chunk.similarity * 100)
     : null;
 
-  const ext = chunk.metadata.source?.split(".").pop()?.toUpperCase() ?? "DOC";
-  const page = chunk.metadata.page ? ` · p.${chunk.metadata.page}` : "";
-  const fileType = chunk.metadata.file_type?.toUpperCase() || ext;
+  const source = chunk.metadata.source || "Unknown Document";
+  const ext = source.split(".").pop()?.toUpperCase() ?? "DOC";
+  const page = chunk.metadata.page ? ` · Page ${chunk.metadata.page}` : "";
+  const chunkIdx = chunk.metadata.chunk_index != null ? ` · Chunk ${chunk.metadata.chunk_index + 1}` : "";
 
   return (
     <div className="source-card">
@@ -29,12 +30,12 @@ function SourceCard({ chunk, index }: { chunk: DocumentChunk; index: number }) {
       >
         <div className="source-left">
           <span className="source-badge">[{index + 1}]</span>
-          <BookOpen size={12} className="source-icon" />
-          <span className="source-name">
-            {chunk.metadata.source}
-            {page}
-          </span>
-          <span className="file-type-badge">{fileType}</span>
+          <FileText size={12} className="source-icon" />
+          <div className="source-name-block">
+            <span className="source-doc-name">{source}</span>
+            <span className="source-position">{page}{chunkIdx}</span>
+          </div>
+          <span className="file-type-badge">{ext}</span>
         </div>
         <div className="source-right">
           {score !== null && (
@@ -54,8 +55,46 @@ function SourceCard({ chunk, index }: { chunk: DocumentChunk; index: number }) {
   );
 }
 
+function DocSummaryStrip({ chunks }: { chunks: DocumentChunk[] }) {
+  const docMap = new Map<string, { count: number; topScore: number; pages: Set<number> }>();
+
+  chunks.forEach((c) => {
+    const src = c.metadata.source || "Unknown";
+    const existing = docMap.get(src) || { count: 0, topScore: 0, pages: new Set<number>() };
+    existing.count++;
+    if (typeof c.similarity === "number" && c.similarity > existing.topScore) {
+      existing.topScore = c.similarity;
+    }
+    if (c.metadata.page) existing.pages.add(c.metadata.page);
+    docMap.set(src, existing);
+  });
+
+  return (
+    <div className="doc-summary-strip">
+      <span className="doc-summary-label">
+        <BookOpen size={11} />
+        Documents used:
+      </span>
+      <div className="doc-pills">
+        {Array.from(docMap.entries()).map(([src, info]) => {
+          const pages = info.pages.size > 0
+            ? ` · pp. ${Array.from(info.pages).sort((a, b) => a - b).slice(0, 3).join(", ")}${info.pages.size > 3 ? "…" : ""}`
+            : "";
+          return (
+            <span key={src} className="doc-pill" title={src}>
+              <FileText size={10} />
+              <strong>{src}</strong>
+              <span className="doc-pill-meta">{info.count} chunk{info.count !== 1 ? "s" : ""}{pages}</span>
+            </span>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export function MessageBubble({ message, isLatest }: Props) {
-  const [showSources, setShowSources] = useState(false);
+  const [showSources, setShowSources] = useState(isLatest);
   const [showReasoning, setShowReasoning] = useState(false);
   const [copied, setCopied] = useState(false);
   const isUser = message.role === "user";
@@ -73,13 +112,11 @@ export function MessageBubble({ message, isLatest }: Props) {
 
   return (
     <div className={`message-wrapper ${isUser ? "user" : "assistant"}`}>
-      {/* Avatar */}
       <div className={`message-avatar ${isUser ? "user-avatar" : "bot-avatar"}`}>
         {isUser ? <User size={15} /> : <Bot size={15} />}
       </div>
 
       <div className="message-body">
-        {/* Bubble */}
         <div className={`message-bubble ${isUser ? "user-bubble" : "assistant-bubble"}`}>
           {isUser ? (
             <p className="user-text">{message.content}</p>
@@ -126,10 +163,12 @@ export function MessageBubble({ message, isLatest }: Props) {
           )}
         </div>
 
-        {/* Message meta + actions */}
+        {!isUser && hasSources && (
+          <DocSummaryStrip chunks={message.sources!} />
+        )}
+
         {!isUser && (
           <div className="message-actions">
-            {/* Elapsed time */}
             {hasElapsed && (
               <span className="meta-chip">
                 <Clock size={10} />
@@ -137,25 +176,22 @@ export function MessageBubble({ message, isLatest }: Props) {
               </span>
             )}
 
-            {/* Copy */}
             <button onClick={copyToClipboard} className="action-btn" title="Copy">
               {copied ? <Check size={12} className="text-green-400" /> : <Copy size={12} />}
               <span>{copied ? "Copied" : "Copy"}</span>
             </button>
 
-            {/* Sources toggle */}
             {hasSources && (
               <button
                 onClick={() => setShowSources(!showSources)}
                 className={`action-btn ${showSources ? "active" : ""}`}
               >
                 <BookOpen size={12} />
-                <span>{message.sources!.length} source{message.sources!.length !== 1 ? "s" : ""}</span>
+                <span>{message.sources!.length} chunk{message.sources!.length !== 1 ? "s" : ""}</span>
                 {showSources ? <ChevronDown size={10} /> : <ChevronRight size={10} />}
               </button>
             )}
 
-            {/* Reasoning toggle */}
             {hasReasoning && (
               <button
                 onClick={() => setShowReasoning(!showReasoning)}
@@ -169,10 +205,9 @@ export function MessageBubble({ message, isLatest }: Props) {
           </div>
         )}
 
-        {/* Sources panel */}
         {showSources && hasSources && (
           <div className="sources-panel">
-            <p className="panel-label">Retrieved Sources</p>
+            <p className="panel-label">Retrieved Chunks</p>
             <div className="sources-grid">
               {message.sources!.map((chunk, i) => (
                 <SourceCard key={chunk.id || i} chunk={chunk} index={i} />
@@ -181,7 +216,6 @@ export function MessageBubble({ message, isLatest }: Props) {
           </div>
         )}
 
-        {/* Reasoning panel */}
         {showReasoning && hasReasoning && (
           <div className="reasoning-panel">
             <div className="reasoning-header">

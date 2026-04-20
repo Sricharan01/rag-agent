@@ -535,6 +535,97 @@ body {
   text-overflow: ellipsis;
 }
 
+/* New: two-line name block — doc name (bold) + position (muted) */
+.source-name-block {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.source-doc-name {
+  font-size: 0.775rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.source-position {
+  font-size: 0.6375rem;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+  white-space: nowrap;
+}
+
+/* ── Document Summary Strip ──────────────────────────────────────── */
+.doc-summary-strip {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(124, 58, 237, 0.06);
+  border: 1px solid rgba(124, 58, 237, 0.18);
+  border-radius: var(--radius);
+  flex-wrap: wrap;
+  animation: fadeIn 0.2s ease;
+}
+
+.doc-summary-label {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--accent-light);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  white-space: nowrap;
+  flex-shrink: 0;
+  padding-top: 0.15rem;
+}
+
+.doc-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.doc-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 100px;
+  background: rgba(124, 58, 237, 0.12);
+  border: 1px solid rgba(124, 58, 237, 0.25);
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  max-width: 260px;
+  overflow: hidden;
+  cursor: default;
+}
+
+.doc-pill strong {
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
+  display: inline-block;
+}
+
+.doc-pill-meta {
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6375rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
 .file-type-badge {
   font-size: 0.6rem;
   font-family: 'JetBrains Mono', monospace;
@@ -545,6 +636,7 @@ body {
   border: 1px solid var(--border);
   flex-shrink: 0;
 }
+
 
 .source-right {
   display: flex;
